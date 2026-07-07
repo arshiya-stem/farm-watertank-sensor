@@ -31,6 +31,11 @@ int tankHeight = 100; // replace this value with actual tank height
 ///@return returns the tank percentage rounded to closest integer
 int GetWaterLevelinPercent();
 
+///@brief setter for the tank height. Sets the tank height to desired height inside program via hc-05 bluetooth module
+///@param no param
+///@return no return
+void SetWatertankHeight();
+
 ///@brief sends integer data through hc-05 bluetooth module
 ///@param integer data to be sent
 ///@return no return
@@ -50,6 +55,7 @@ void loop() {
   ///testing Ultrasonic sensor
   Serial.println("Tank percent: " + String(GetWaterLevelinPercent()) + "%");
   TransmitDataBluetooth(GetWaterLevelinPercent());
+  SetWatertankHeight();
   delay(500);
 }
 
@@ -75,4 +81,9 @@ void TransmitDataBluetooth(int data) {
   Serial1.println(data);
 }
 
-
+void SetWatertankHeight() {
+  if (Serial1.available()){
+    tankHeight = (int)Serial1.read();
+    Serial.println("Successfully changed tank height");
+  }
+}
