@@ -38,6 +38,7 @@ int GetWaterLevelinPercent();
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
+  Serial1.begin(9600);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
 
