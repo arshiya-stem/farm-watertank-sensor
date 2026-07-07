@@ -72,10 +72,7 @@ int GetWaterLevelinPercent() {
 }
 
 void TransmitDataBluetooth(int data) {
-  if (!Serial1.available()) {
-    Serial.println("Serial1 not available ...");
-    return;
-  }
-
   Serial1.println(data);
 }
+
+
