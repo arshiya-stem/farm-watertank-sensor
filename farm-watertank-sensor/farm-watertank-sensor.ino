@@ -10,6 +10,8 @@ compute how much (%) is filled based on Tank height, and transmit the data via H
 ///@version 0.1
 */
 
+#include <SoftwareSerial.h>
+
 /// Ultrasonic sensor pins
 const int trigPin = 8;
 const int echoPin = 9;
@@ -29,6 +31,10 @@ int tankHeight = 100; // replace this value with actual tank height
 ///@return returns the tank percentage rounded to closest integer
 int GetWaterLevelinPercent();
 
+///@brief sends integer data through hc-05 bluetooth module
+///@param integer data to be sent
+///@return no return
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -42,6 +48,7 @@ void loop() {
 
   ///testing Ultrasonic sensor
   Serial.println("Tank percent: " + String(GetWaterLevelinPercent()) + "%");
+  TransmitDataBluetooth(GetWaterLevelinPercent());
   delay(500);
 }
 
@@ -61,4 +68,13 @@ int GetWaterLevelinPercent() {
 
   int percent = ((tankHeight - distance) / tankHeight) * 100;
   return percent;
+}
+
+void TransmitDataBluetooth(int data) {
+  if (!Serial1.available()) {
+    Serial.println("Serial1 not available ...");
+    return;
+  }
+
+  Serial1.println(data);
 }
