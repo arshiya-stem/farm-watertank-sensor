@@ -20,7 +20,7 @@ const int yellowLED = 5;
 const int redLED = 6;
 
 /// Tank Height
-int tankHeight = 0; // replace this value with actual tank height
+int tankHeight = 100; // replace this value with actual tank height
 
 ///Function declarations
 
@@ -31,6 +31,7 @@ int GetWaterLevelinPercent();
 
 void setup() {
   // put your setup code here, to run once:
+  Serial.begin(9600);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
 
@@ -39,6 +40,9 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
+  ///testing Ultrasonic sensor
+  Serial.println("Tank percent: " + String(GetWaterLevelinPercent()) + "%");
+  delay(500);
 }
 
 ///Function defenitions
@@ -52,5 +56,9 @@ int GetWaterLevelinPercent() {
 
   float duration = pulseIn(echoPin, HIGH);
   float distance = (duration * 0.0343)/2;
-  return ((tankHeight - distance) / tankHeight) * 100;
+  
+  delay(100);
+
+  int percent = ((tankHeight - distance) / tankHeight) * 100;
+  return percent;
 }
