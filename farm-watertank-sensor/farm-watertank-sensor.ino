@@ -19,6 +19,9 @@ const int greenLED = 4;
 const int yellowLED = 5;
 const int redLED = 6;
 
+/// Tank Height
+int tankHeight = 0; // replace this value with actual tank height
+
 ///Function declarations
 
 ///@brief used to get the amount of liquid in tank as percent
