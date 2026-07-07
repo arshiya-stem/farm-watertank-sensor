@@ -14,22 +14,40 @@ compute how much (%) is filled based on Tank height, and transmit the data via H
 const int trigPin = 8;
 const int echoPin = 9;
 
-/// Ultrasonic variables for distance measurement
-float duration, distance;
-
 /// LED pins
 const int greenLED = 4;
 const int yellowLED = 5;
 const int redLED = 6;
 
-///Function defenitions
+///Function declarations
+
+///@brief used to get the amount of liquid in tank as percent
+///@param no parameters
+///@return returns the tank percentage rounded to closest integer
+int GetWaterLevelinPercent();
 
 void setup() {
   // put your setup code here, to run once:
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
+}
+
+///Function defenitions
+
+int GetWaterLevelinPercent() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  float duration = pulseIn(echoPin, HIGH);
+  float distance = (duration * 0.0343)/2;
+  return ((tankHeight - distance) / tankHeight) * 100;
 }
