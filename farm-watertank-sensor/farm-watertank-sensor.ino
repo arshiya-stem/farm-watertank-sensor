@@ -10,7 +10,7 @@ compute how much (%) is filled based on Tank height, and transmit the data via H
 ///@version 0.1
 */
 
-#include <SoftwareSerial.h>
+#include <EEPROM.h>
 
 /// Ultrasonic sensor pins
 const int trigPin = 8;
@@ -21,8 +21,9 @@ const int greenLED = 4;
 const int yellowLED = 5;
 const int redLED = 6;
 
-/// Tank Height
-int tankHeight = 100; // replace this value with actual tank height
+/// Tank Height & EEPROM
+int tankHeightADDR = 0;
+int tankHeight; 
 
 ///Function declarations
 
@@ -46,6 +47,14 @@ void setup() {
   Serial1.begin(9600);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
+
+  if (EEPROM.read(tankHeightADDR) == 0xFF) {
+    EEPROM.write(tankHeightADDR, 100);  //default tank height is 1 meter
+  }
+
+  delay(300);
+  tankHeight = EEPROM.read(tankHeightADDR);
+  Serial.println("Tank height = " + String(tankHeight));
 
 }
 
@@ -86,9 +95,15 @@ void SetWatertankHeight() {
 
     //testing: reading raw values from Serial Bluetooth Terminal to determine the data type recieved
     tankHeight = Serial1.parseInt();
+
+    //update EEPROM with new tank height
+    EEPROM.update(tankHeightADDR, tankHeight);
+    delay(300);
+    Serial.println("EEPROM tankheight: " + EEPROM.read(tankHeightADDR));
+
     Serial.println("new height: " + String(tankHeight));
     Serial1.println("new height: " + String(tankHeight));
-    
+
     Serial1.flush();
   }
 }
