@@ -56,7 +56,7 @@ void loop() {
   Serial.println("Tank percent: " + String(GetWaterLevelinPercent()) + "%");
   TransmitDataBluetooth(GetWaterLevelinPercent());
   SetWatertankHeight();
-  delay(500);
+  delay(1000);
 }
 
 ///Function defenitions
@@ -71,7 +71,7 @@ int GetWaterLevelinPercent() {
   float duration = pulseIn(echoPin, HIGH);
   float distance = (duration * 0.0343)/2;
   
-  delay(100);
+  delay(500);
 
   int percent = ((tankHeight - distance) / tankHeight) * 100;
   return percent;
@@ -83,7 +83,12 @@ void TransmitDataBluetooth(int data) {
 
 void SetWatertankHeight() {
   if (Serial1.available()){
-    tankHeight = (int)Serial1.read();
-    Serial.println("Successfully changed tank height");
+
+    //testing: reading raw values from Serial Bluetooth Terminal to determine the data type recieved
+    tankHeight = Serial1.parseInt();
+    Serial.println("new height: " + String(tankHeight));
+    Serial1.println("new height: " + String(tankHeight));
+    
+    Serial1.flush();
   }
 }
