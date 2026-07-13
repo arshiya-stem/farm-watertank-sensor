@@ -110,5 +110,4 @@ void SetWatertankHeight() {
     Serial.println("new height: " + String(tankHeight));
     //flush the Serial buffer
     Serial1.flush();
-  }
 }
