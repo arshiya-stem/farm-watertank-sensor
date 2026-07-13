@@ -47,7 +47,11 @@ void setup() {
   Serial1.begin(9600);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
+  pinMode(greenLED, OUTPUT);
+  pinMode(yellowLED, OUTPUT);
+  pinMode(redLED, OUTPUT);
 
+  //check if EEPROM is empty
   if (EEPROM.read(tankHeightADDR) == 0xFF) {
     EEPROM.write(tankHeightADDR, 100);  //default tank height is 1 meter
   }
@@ -55,7 +59,6 @@ void setup() {
   delay(300);
   tankHeight = EEPROM.read(tankHeightADDR);
   Serial.println("Tank height = " + String(tankHeight));
-
 }
 
 void loop() {
@@ -64,12 +67,13 @@ void loop() {
   ///testing Ultrasonic sensor
   Serial.println("Tank percent: " + String(GetWaterLevelinPercent()) + "%");
   TransmitDataBluetooth(GetWaterLevelinPercent());
-  SetWatertankHeight();
+  if (Serial1.available()) SetWatertankHeight();
   delay(1000);
 }
 
 ///Function defenitions
 
+//calculate the percentage of liquid in tank based on Ultrasonic sensor reading
 int GetWaterLevelinPercent() {
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
@@ -86,13 +90,16 @@ int GetWaterLevelinPercent() {
   return percent;
 }
 
+//transmit data via Bluetooth
 void TransmitDataBluetooth(int data) {
+  digitalWrite(greenLED, HIGH);
   Serial1.println(data);
+  delay(500);
+  digitalWrite(greenLED, LOW);
 }
 
+//Set and store the tank height based on recieved bluetooth packet
 void SetWatertankHeight() {
-  if (Serial1.available()){
-
     //testing: reading raw values from Serial Bluetooth Terminal to determine the data type recieved
     tankHeight = Serial1.parseInt();
 
@@ -100,10 +107,8 @@ void SetWatertankHeight() {
     EEPROM.update(tankHeightADDR, tankHeight);
     delay(300);
     Serial.println("EEPROM tankheight: " + EEPROM.read(tankHeightADDR));
-
     Serial.println("new height: " + String(tankHeight));
-    Serial1.println("new height: " + String(tankHeight));
-
+    //flush the Serial buffer
     Serial1.flush();
   }
 }
