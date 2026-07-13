@@ -17,9 +17,9 @@ const int trigPin = 8;
 const int echoPin = 9;
 
 /// LED pins
-const int greenLED = 4;
+const int greenLED = 6;
 const int yellowLED = 5;
-const int redLED = 6;
+const int redLED = 4;
 
 /// Tank Height & EEPROM
 int tankHeightADDR = 0;
@@ -87,6 +87,7 @@ int GetWaterLevelinPercent() {
   delay(500);
 
   int percent = ((tankHeight - distance) / tankHeight) * 100;
+  percent = constrain(percent, 0, 100);
   return percent;
 }
 
