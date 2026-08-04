@@ -8,9 +8,17 @@ This program uses an Ultrasonic sensor to detect the distance from water surface
 compute how much (%) is filled based on Tank height, and transmit the data via HC-05 bluetooth module
 
 ///@version 0.1
+
+///@version 0.2
+///@date: August 2nd, 2026
+///@brief
+this update modifies the code such that when the device is not used, it enters sleep mode to preserve energy.
+When the user tries to connect to the HC05 bluetooth module, it will wake up the device, where it will start recording the water tank
 */
 
 #include <EEPROM.h>
+#include <avr/sleep.h>
+#include <avr/interrupt.h>
 
 /// Ultrasonic sensor pins
 const int trigPin = 8;
@@ -24,6 +32,9 @@ const int redLED = 4;
 /// Tank Height & EEPROM
 int tankHeightADDR = 0;
 int tankHeight; 
+
+/// external interrupt pin
+const int bleInterrupt = 2;
 
 ///Function declarations
 
@@ -40,6 +51,12 @@ void SetWatertankHeight();
 ///@brief sends integer data through hc-05 bluetooth module
 ///@param integer data to be sent
 ///@return no return
+void TransmitDataBluetooth(int data);
+
+///@brief sets the mcu into sleep mode
+///@param no param
+///@return no return
+void Sleep();
 
 void setup() {
   // put your setup code here, to run once:
@@ -55,10 +72,11 @@ void setup() {
   if (EEPROM.read(tankHeightADDR) == 0xFF) {
     EEPROM.write(tankHeightADDR, 100);  //default tank height is 1 meter
   }
-
   delay(300);
   tankHeight = EEPROM.read(tankHeightADDR);
   Serial.println("Tank height = " + String(tankHeight));
+  
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 }
 
 void loop() {
@@ -111,4 +129,14 @@ void SetWatertankHeight() {
     Serial.println("new height: " + String(tankHeight));
     //flush the Serial buffer
     Serial1.flush();
+}
+
+//puts the mcu to sleep
+void Sleep() {
+  sleep_enable();
+  sei();
+  sleep_cpu();
+
+  ///program resumes from here when woken up
+  sleep_disable();
 }
