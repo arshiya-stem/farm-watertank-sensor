@@ -58,6 +58,11 @@ void TransmitDataBluetooth(int data);
 ///@return no return
 void Sleep();
 
+///@brief setup interrupt request line function for the bluetooth module
+///@param no param
+///@return no return
+void BleISR();
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -76,17 +81,26 @@ void setup() {
   tankHeight = EEPROM.read(tankHeightADDR);
   Serial.println("Tank height = " + String(tankHeight));
   
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  attachInterrupt(digitalPinToInterrupt(bleInterrupt), BleISR, HIGH);  //enable interrupt
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);        //set the sleep mode to most efficient -> change if needed
+
+  Sleep();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
   ///testing Ultrasonic sensor
-  Serial.println("Tank percent: " + String(GetWaterLevelinPercent()) + "%");
-  TransmitDataBluetooth(GetWaterLevelinPercent());
-  if (Serial1.available()) SetWatertankHeight();
+  if (bleInterrupt == LOW) {  //the bluetooth module is disconnected
+    Sleep();
+  } else {
+    Serial.println("Tank percent: " + String(GetWaterLevelinPercent()) + "%");
+    TransmitDataBluetooth(GetWaterLevelinPercent());
+    if (Serial1.available()) SetWatertankHeight();
+  }
+
   delay(1000);
+
 }
 
 ///Function defenitions
@@ -139,4 +153,9 @@ void Sleep() {
 
   ///program resumes from here when woken up
   sleep_disable();
+  detachInterrupt(digitalPinToInterrupt(bleInterrupt));
+}
+
+void BleISR() {
+  attachInterrupt(digitalPinToInterrupt(bleInterrupt), BleISR, HIGH);
 }
